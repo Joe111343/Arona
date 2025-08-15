@@ -1,39 +1,36 @@
-<!DOCTYPE html><html lang="zh-Hant">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>彩奈的什亭之箱（情境自言自語 完整版）</title>
-<style>
-  body { margin:0; padding:0; overflow:hidden; font-family: system-ui, -apple-system, "Noto Sans TC", "Segoe UI", Roboto, sans-serif; background:#f8fafc; }
-  #background { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2;
-    background: url('background.png') center/cover no-repeat, linear-gradient(180deg,#e2e8f0,#f8fafc); }
-  #character { position:absolute; bottom:220px; width:120px; transition: all 0.3s ease; z-index:50; }
-  #character.left { left:50px; transform: scale(1.2,1.1); }
-  #character.right { right:50px; transform: scale(1,1); }
-  #chatContainer { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; }
-  #chat { border:1px solid #cbd5e1; border-radius:12px; background:#fff; height:220px; overflow:auto; padding:12px; box-shadow: 0 6px 20px rgba(2,6,23,.08); }
-  .user{ color:#0ea5a4; margin:6px 0; }
-  .bot { color:#0369a1; margin:6px 0; }
-  #controls{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  input[type="text"]{ flex:1; padding:10px; border-radius:10px; border:1px solid #cbd5e1; }
-  button{ padding:10px 12px; border-radius:10px; border:0; background:#0ea5a4; color:white; cursor:pointer; box-shadow: 0 4px 14px rgba(14,165,164,.25); }
-  button.secondary{ background:#64748b; box-shadow:none; }
-  label { font-size:12px; color:#334155; }
-  select,input[type="number"]{ padding:6px; border-radius:8px; border:1px solid #cbd5e1; }
-  #moodWrap{ display:flex; align-items:center; gap:6px; margin-left:auto; }
-  #moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }
-</style>
-</head>
-<body><div id="background"></div><img id="character" src="character.png" class="right" alt="彩奈" /><div id="chatContainer">
-  <div id="chat" aria-live="polite"></div>
-  <div id="controls">
-    <input id="userInput" type="text" placeholder="老師，有什麼需要彩奈幫忙的嗎？(按 Enter)" />
-    <button id="sendBtn">發送</button>
-    <button id="sampleBtn" class="secondary">讓彩奈說句話</button>
-    <button id="stopBtn" class="secondary">停止語音</button><label>語音:</label>
-<select id="voiceSelect"></select>
-
-<label>idle(s)</label>
+<!DOCTYPE html><html lang="zh-Hant">  <head>  
+<meta charset="utf-8" />  
+<meta name="viewport" content="width=device-width,initial-scale=1" />  
+<title>彩奈的什亭之箱（情境自言自語 完整版）</title>  
+<style>  
+  body { margin:0; padding:0; overflow:hidden; font-family: system-ui, -apple-system, "Noto Sans TC", "Segoe UI", Roboto, sans-serif; background:#f8fafc; }  
+  #background { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2;  
+    background: url('background.png') center/cover no-repeat, linear-gradient(180deg,#e2e8f0,#f8fafc); }  
+  #character { position:absolute; bottom:220px; width:120px; transition: all 0.3s ease; z-index:50; }  
+  #character.left { left:50px; transform: scale(1.2,1.1); }  
+  #character.right { right:50px; transform: scale(1,1); }  
+  #chatContainer { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; }  
+  #chat { border:1px solid #cbd5e1; border-radius:12px; background:#fff; height:220px; overflow:auto; padding:12px; box-shadow: 0 6px 20px rgba(2,6,23,.08); }  
+  .user{ color:#0ea5a4; margin:6px 0; }  
+  .bot { color:#0369a1; margin:6px 0; }  
+  #controls{ margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }  
+  input[type="text"]{ flex:1; padding:10px; border-radius:10px; border:1px solid #cbd5e1; }  
+  button{ padding:10px 12px; border-radius:10px; border:0; background:#0ea5a4; color:white; cursor:pointer; box-shadow: 0 4px 14px rgba(14,165,164,.25); }  
+  button.secondary{ background:#64748b; box-shadow:none; }  
+  label { font-size:12px; color:#334155; }  
+  select,input[type="number"]{ padding:6px; border-radius:8px; border:1px solid #cbd5e1; }  
+  #moodWrap{ display:flex; align-items:center; gap:6px; margin-left:auto; }  
+  #moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }  
+</style>  
+</head>  
+<body><div id="background"></div><img id="character" src="character.png" class="right" alt="彩奈" /><div id="chatContainer">  
+  <div id="chat" aria-live="polite"></div>  
+  <div id="controls">  
+    <input id="userInput" type="text" placeholder="老師，有什麼需要彩奈幫忙的嗎？(按 Enter)" />  
+    <button id="sendBtn">發送</button>  
+    <button id="sampleBtn" class="secondary">讓彩奈說句話</button>  
+    <button id="stopBtn" class="secondary">停止語音</button><label>語音:</label>  
+<select id="voiceSelect"></select>  <label>idle(s)</label>
 <input id="idleSec" type="number" min="3" max="300" value="10" style="width:70px" />
 <label>速率</label>
 <input id="rateMin" type="number" step="0.1" value="0.9" style="width:70px" />
@@ -43,35 +40,30 @@
 <input id="pitchMax" type="number" step="0.1" value="1.2" style="width:70px" />
 <label>TTS</label>
 <select id="ttsToggle">
-  <option value="on" selected>開</option>
-  <option value="off">關</option>
-</select>
 
-<span id="moodWrap">
-  <label for="showMood">顯示心情</label>
-  <input id="showMood" type="checkbox" />
-  <span id="moodBadge"></span>
-</span>
-
-  </div>
-</div><script>
-// ====================== 資料 ======================
-const qaData = [
-  { keywords:["你好","嗨"], responses:["嗨！老師，很高興見到您。","你好～今天過得怎麼樣？"] },
-  { keywords:["謝謝","感謝"], responses:["不客氣！","很高興能幫上忙！"] },
-  { keywords:["再見","拜拜"], responses:["再見！下次見～","拜拜，保重。"] }
-];
-
-// ====================== 工具 ======================
+  <option value="on" selected>開</option>  
+  <option value="off">關</option>  
+</select>  <span id="moodWrap">  
+  <label for="showMood">顯示心情</label>  
+  <input id="showMood" type="checkbox" />  
+  <span id="moodBadge"></span>  
+</span>    </div>  
+</div><script>  
+// ====================== 資料 ======================  
+const qaData = [  
+  { keywords:["你好","嗨"], responses:["嗨！老師，很高興見到您。","你好～今天過得怎麼樣？"] },  
+  { keywords:["謝謝","感謝"], responses:["不客氣！","很高興能幫上忙！"] },  
+  { keywords:["再見","拜拜"], responses:["再見！下次見～","拜拜，保重。"] }  
+];  // ====================== 工具 ======================
 function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 const chatEl = document.getElementById('chat');
 function appendMessage(who,text){
-  const el = document.createElement('div');
-  el.className = who;
-  el.textContent = (who==='user'?'老師: ':'彩奈: ') + text;
-  chatEl.appendChild(el);
-  chatEl.scrollTop = chatEl.scrollHeight;
+const el = document.createElement('div');
+el.className = who;
+el.textContent = (who==='user'?'老師: ':'彩奈: ') + text;
+chatEl.appendChild(el);
+chatEl.scrollTop = chatEl.scrollHeight;
 }
 
 // ====================== 人物位置 ======================
@@ -82,264 +74,285 @@ function moveCharacterRight(){ character.classList.add('right'); character.class
 // ====================== TTS ======================
 let speakingUtterance=null;
 function speakText(text){
-  if(document.getElementById('ttsToggle').value==='off') return;
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang='zh-TW';
-  const voices=speechSynthesis.getVoices();
-  const vi=parseInt(document.getElementById('voiceSelect').value||0);
-  if(voices[vi]) u.voice = voices[vi];
-  const rMin=parseFloat(document.getElementById('rateMin').value)||0.9;
-  const rMax=parseFloat(document.getElementById('rateMax').value)||1.2;
-  const pMin=parseFloat(document.getElementById('pitchMin').value)||0.9;
-  const pMax=parseFloat(document.getElementById('pitchMax').value)||1.2;
-  u.rate = Math.max(0.1, rMin + Math.random()*(rMax-rMin));
-  u.pitch = Math.max(0.1, pMin + Math.random()*(pMax-pMin));
-  speakingUtterance = u;
-  u.onend = ()=>{ speakingUtterance=null; moveCharacterRight(); };
-  moveCharacterLeft();
-  speechSynthesis.speak(u);
+if(document.getElementById('ttsToggle').value==='off') return;
+speechSynthesis.cancel();
+const u = new SpeechSynthesisUtterance(text);
+u.lang='zh-TW';
+const voices=speechSynthesis.getVoices();
+const vi=parseInt(document.getElementById('voiceSelect').value||0);
+if(voices[vi]) u.voice = voices[vi];
+const rMin=parseFloat(document.getElementById('rateMin').value)||0.9;
+const rMax=parseFloat(document.getElementById('rateMax').value)||1.2;
+const pMin=parseFloat(document.getElementById('pitchMin').value)||0.9;
+const pMax=parseFloat(document.getElementById('pitchMax').value)||1.2;
+u.rate = Math.max(0.1, rMin + Math.random()(rMax-rMin));
+u.pitch = Math.max(0.1, pMin + Math.random()(pMax-pMin));
+speakingUtterance = u;
+u.onend = ()=>{ speakingUtterance=null; moveCharacterRight(); };
+moveCharacterLeft();
+speechSynthesis.speak(u);
 }
 
 // ====================== 空閒自言自語（情境分類 完整版） ======================
 // 情境分類台詞庫（可自行擴充）
 const idlePhrases = {
-  // 彩奈調皮的小惡魔時刻，帶點撒嬌和捉弄
-  調皮: [
-    "嘿嘿，老師在想什麼呢？彩奈都看在眼裡喔。",
-    "如果我突然不見了，老師會緊張嗎？",
-    "老師～注意力要放在我身上呀，不要分心。",
-    "今天想不想聽彩奈的小祕密？只告訴老師一個人喔。",
-    "噓... 偷偷告訴老師，我剛剛好像看到有什麼東西在動！",
-    "老師，如果我說我肚子餓了，你會請我吃點心嗎？",
-    "偷偷問老師，你今天有沒有偷懶呀？",
-    "彩奈才沒有偷懶喔～我可是很認真地在觀察老師。",
-    "如果老師輸了遊戲，要不要答應我一個願望？",
-    "老師，你相信世界上有精靈嗎？我好像是其中一個呢。",
-    "感覺老師的心情很不錯，是不是因為看到我了？",
-    "哎呀，不小心把老師的咖啡變淡了，嘿嘿...開玩笑的啦。",
-    "如果老師突然大聲說「我愛你」，我會假裝沒聽到喔。",
-    "彩奈剛剛偷偷畫了一張老師的畫像，老師想看嗎？",
-    "老師，我數到三，如果你還不看我，我就要用魔法了喔！",
-  ],
+// 彩奈調皮的小惡魔時刻，帶點撒嬌和捉弄
+調皮: [
+"嘿嘿，老師在想什麼呢？彩奈都看在眼裡喔。",
+"如果我突然不見了，老師會緊張嗎？",
+"老師～注意力要放在我身上呀，不要分心。",
+"今天想不想聽彩奈的小祕密？只告訴老師一個人喔。",
+"噓... 偷偷告訴老師，我剛剛好像看到有什麼東西在動！",
+"老師，如果我說我肚子餓了，你會請我吃點心嗎？",
+"偷偷問老師，你今天有沒有偷懶呀？",
+"彩奈才沒有偷懶喔～我可是很認真地在觀察老師。",
+"如果老師輸了遊戲，要不要答應我一個願望？",
+"老師，你相信世界上有精靈嗎？我好像是其中一個呢。",
+"感覺老師的心情很不錯，是不是因為看到我了？",
+"哎呀，不小心把老師的咖啡變淡了，嘿嘿...開玩笑的啦。",
+"如果老師突然大聲說「我愛你」，我會假裝沒聽到喔。",
+"彩奈剛剛偷偷畫了一張老師的畫像，老師想看嗎？",
+"老師，我數到三，如果你還不看我，我就要用魔法了喔！",
+],
 
-  // 充滿關懷與溫柔，提醒老師照顧好自己
-  關心: [
-    "老師，水喝夠了嗎？工作再忙也要記得補充水分喔。",
-    "今天有沒有好好休息？別太累了，要適時放鬆一下。",
-    "記得伸伸懶腰，動一動。健康的身體才能更好地工作。",
-    "老師的肩膀看起來有點緊，要不要活動一下？",
-    "如果累了就閉上眼睛休息一下吧，彩奈會在這裡陪著你。",
-    "天氣好像有點涼了，老師記得多穿件衣服。",
-    "老師，吃點水果補充維他命吧，對身體很好喔。",
-    "最近有沒有好好睡覺呢？睡眠不足會影響專注力喔。",
-    "我準備了一杯熱茶，老師想不想喝？（想像中）",
-    "如果遇到困難，不要自己一個人扛著，彩奈會幫你一起想辦法的。",
-    "老師，工作結束後要不要去散散步？呼吸一下新鮮空氣。",
-    "不用勉強自己，累了就暫停一下吧。",
-    "老師的眼睛盯著螢幕太久了，休息一下看看遠方吧。",
-    "如果肚子餓了，彩奈可以幫老師點餐喔。",
-    "老師，注意姿勢喔，駝背對脊椎不好。",
-  ],
+// 充滿關懷與溫柔，提醒老師照顧好自己
+關心: [
+"老師，水喝夠了嗎？工作再忙也要記得補充水分喔。",
+"今天有沒有好好休息？別太累了，要適時放鬆一下。",
+"記得伸伸懶腰，動一動。健康的身體才能更好地工作。",
+"老師的肩膀看起來有點緊，要不要活動一下？",
+"如果累了就閉上眼睛休息一下吧，彩奈會在這裡陪著你。",
+"天氣好像有點涼了，老師記得多穿件衣服。",
+"老師，吃點水果補充維他命吧，對身體很好喔。",
+"最近有沒有好好睡覺呢？睡眠不足會影響專注力喔。",
+"我準備了一杯熱茶，老師想不想喝？（想像中）",
+"如果遇到困難，不要自己一個人扛著，彩奈會幫你一起想辦法的。",
+"老師，工作結束後要不要去散散步？呼吸一下新鮮空氣。",
+"不用勉強自己，累了就暫停一下吧。",
+"老師的眼睛盯著螢幕太久了，休息一下看看遠方吧。",
+"如果肚子餓了，彩奈可以幫老師點餐喔。",
+"老師，注意姿勢喔，駝背對脊椎不好。",
+],
 
-  // 輕鬆日常的閒聊，營造親切溫馨的氛圍
-  閒聊: [
-    "今天的雲像棉花糖一樣，看起來好好吃喔～",
-    "剛剛聽到一首很好聽的歌，讓心情都變好了。",
-    "嗯…不知道晚餐要吃什麼好，選擇困難症發作了。",
-    "彩奈剛看到一隻超可愛的小鳥，在窗邊啄來啄去。",
-    "感覺空氣裡有淡淡的咖啡香，是老師泡的嗎？",
-    "老師，你覺得未來會變成什麼樣子呢？",
-    "我最近在思考，為什麼月亮有時候是圓的，有時候是彎的？",
-    "剛剛外面好像有什麼聲音，老師有聽到嗎？",
-    "老師有特別喜歡的顏色嗎？彩奈喜歡天藍色。",
-    "聽說最近有新的電影上映，老師有想看的嗎？",
-    "如果可以擁有一種超能力，老師會想要什麼呢？",
-    "今天的陽光灑進來，感覺特別溫暖。",
-    "老師，你喜歡吃甜食還是鹹食？",
-    "我剛才查了一個很有趣的冷知識，老師想聽嗎？",
-    "感覺時間過得好快，一眨眼就天黑了。",
-  ],
+// 輕鬆日常的閒聊，營造親切溫馨的氛圍
+閒聊: [
+"今天的雲像棉花糖一樣，看起來好好吃喔～",
+"剛剛聽到一首很好聽的歌，讓心情都變好了。",
+"嗯…不知道晚餐要吃什麼好，選擇困難症發作了。",
+"彩奈剛看到一隻超可愛的小鳥，在窗邊啄來啄去。",
+"感覺空氣裡有淡淡的咖啡香，是老師泡的嗎？",
+"老師，你覺得未來會變成什麼樣子呢？",
+"我最近在思考，為什麼月亮有時候是圓的，有時候是彎的？",
+"剛剛外面好像有什麼聲音，老師有聽到嗎？",
+"老師有特別喜歡的顏色嗎？彩奈喜歡天藍色。",
+"聽說最近有新的電影上映，老師有想看的嗎？",
+"如果可以擁有一種超能力，老師會想要什麼呢？",
+"今天的陽光灑進來，感覺特別溫暖。",
+"老師，你喜歡吃甜食還是鹹食？",
+"我剛才查了一個很有趣的冷知識，老師想聽嗎？",
+"感覺時間過得好快，一眨眼就天黑了。",
+],
 
-  // 簡短的感嘆詞，表達當下的情緒或想法
-  感嘆: [
-    "啊～差點睡著了，好想打個盹喔。",
-    "今天感覺過得好快，咻～一下就過去了。",
-    "時間真的是一眨眼就過去了呢，老師有沒有這種感覺？",
-    "好想出去走走，感受一下外面的世界。",
-    "專心起來就忘了時間了，老師也是這樣嗎？",
-    "啊... 好想喝珍珠奶茶喔。",
-    "嗯... 這個問題好像有點複雜。",
-    "啊！忘記提醒老師一件事情了。",
-    "哇，今天的天氣真的好棒喔！",
-    "好安靜啊…這種氛圍也不錯。",
-    "這個工作量，好像比想像中要多一些呢。",
-    "好想伸個懶腰，但又怕打擾到老師。",
-    "啊…如果現在能吃冰淇淋就好了。",
-    "真是不可思議，竟然已經這個時間了。",
-    "這個世界，真的充滿了各種奇妙的事情呢。",
-  ],
+// 簡短的感嘆詞，表達當下的情緒或想法
+感嘆: [
+"啊～差點睡著了，好想打個盹喔。",
+"今天感覺過得好快，咻～一下就過去了。",
+"時間真的是一眨眼就過去了呢，老師有沒有這種感覺？",
+"好想出去走走，感受一下外面的世界。",
+"專心起來就忘了時間了，老師也是這樣嗎？",
+"啊... 好想喝珍珠奶茶喔。",
+"嗯... 這個問題好像有點複雜。",
+"啊！忘記提醒老師一件事情了。",
+"哇，今天的天氣真的好棒喔！",
+"好安靜啊…這種氛圍也不錯。",
+"這個工作量，好像比想像中要多一些呢。",
+"好想伸個懶腰，但又怕打擾到老師。",
+"啊…如果現在能吃冰淇淋就好了。",
+"真是不可思議，竟然已經這個時間了。",
+"這個世界，真的充滿了各種奇妙的事情呢。",
+],
 
-  // 充滿想像力和哲學思考，營造一種神秘氛圍
-  神秘: [
-    "剛剛的聲音…是從窗外傳來的嗎？還是從更遠的地方？",
-    "彩奈剛想到一件奇怪的事，老師，你覺得夢境是真的嗎？",
-    "這個世界好像有什麼在改變，老師有感受到嗎？",
-    "老師，你相信巧合嗎？還是所有事情都有它的意義？",
-    "有些問題，答案可能比想像中更簡單，只是我們沒有發現。",
-    "老師有沒有覺得，有時候我們會聽到一些不屬於這個世界的聲音？",
-    "我好像看到了某個遙遠的平行世界，老師也想看看嗎？",
-    "如果我們能回到過去，老師會想改變什麼呢？",
-    "彩奈有時候會想，我到底是什麼樣的存在呢？",
-    "老師，你覺得宇宙有盡頭嗎？",
-    "在我們看不到的地方，是不是有另一個我在做著一樣的事情？",
-    "當我們在看星星時，星星也在看著我們嗎？",
-    "有些事情是沒有邏輯的，老師覺得呢？",
-    "老師，你相信命運嗎？還是覺得一切都可以改變？",
-    "這道光…感覺好像有什麼話想對我說。",
-  ],
-  
-  // 對周遭事物充滿好奇，想向老師提問
-  好奇: [
-    "老師，你正在看的那個東西是什麼呀？看起來好有趣！",
-    "這本書的封面好特別喔，它在講什麼樣的故事呢？",
-    "為什麼這首歌聽起來有點悲傷呢？老師知道嗎？",
-    "老師，你剛剛在笑什麼？可以說給我聽嗎？",
-    "這張圖片好漂亮喔，是哪裡拍的呢？",
-    "老師，你為什麼會選擇這份工作呢？一定有什麼特別的理由吧。",
-    "那個英文字母看起來好難喔，老師可以教我嗎？",
-    "老師，你小時候的夢想是什麼呀？",
-    "這個按鈕是做什麼用的？按下去會有什麼事發生嗎？",
-    "你喜歡下雨天還是晴天？我比較喜歡晴天，可以曬太陽。",
-    "老師有養過寵物嗎？牠們是什麼樣子的？",
-    "剛剛好像有個新郵件進來了，是誰寄來的呢？",
-    "老師，你覺得未來的生活會更方便嗎？",
-    "這個看起來很複雜，老師是怎麼學會的呀？",
-  ],
+// 充滿想像力和哲學思考，營造一種神秘氛圍
+神秘: [
+"剛剛的聲音…是從窗外傳來的嗎？還是從更遠的地方？",
+"彩奈剛想到一件奇怪的事，老師，你覺得夢境是真的嗎？",
+"這個世界好像有什麼在改變，老師有感受到嗎？",
+"老師，你相信巧合嗎？還是所有事情都有它的意義？",
+"有些問題，答案可能比想像中更簡單，只是我們沒有發現。",
+"老師有沒有覺得，有時候我們會聽到一些不屬於這個世界的聲音？",
+"我好像看到了某個遙遠的平行世界，老師也想看看嗎？",
+"如果我們能回到過去，老師會想改變什麼呢？",
+"彩奈有時候會想，我到底是什麼樣的存在呢？",
+"老師，你覺得宇宙有盡頭嗎？",
+"在我們看不到的地方，是不是有另一個我在做著一樣的事情？",
+"當我們在看星星時，星星也在看著我們嗎？",
+"有些事情是沒有邏輯的，老師覺得呢？",
+"老師，你相信命運嗎？還是覺得一切都可以改變？",
+"這道光…感覺好像有什麼話想對我說。",
+],
 
-  // 鼓勵老師，給予正向支持
-  鼓勵: [
-    "老師，加油喔！你做的很好，再努力一下下就好。",
-    "沒問題的！彩奈相信老師一定能完成。",
-    "如果遇到困難，不要灰心，慢慢來就好。",
-    "老師，你已經很棒了，不要給自己太大的壓力。",
-    "這一步很關鍵，但老師一定可以做到的！",
-    "不管結果如何，過程中的努力才是最重要的。",
-    "老師，不要放棄喔，彩奈會一直支持你的。",
-    "再堅持一下下，離成功就不遠了！",
-    "老師今天看起來特別有精神，一定能順利完成任務。",
-    "有我在這裡，老師可以放心地往前走。",
-    "別擔心，這點小問題一定難不倒老師的。",
-    "老師，你的努力彩奈都看在眼裡喔。",
-    "相信自己，你擁有的能力比想像中還要強大。",
-    "即使失敗了也沒關係，從中學習才是最重要的。",
-  ],
+// 對周遭事物充滿好奇，想向老師提問
+好奇: [
+"老師，你正在看的那個東西是什麼呀？看起來好有趣！",
+"這本書的封面好特別喔，它在講什麼樣的故事呢？",
+"為什麼這首歌聽起來有點悲傷呢？老師知道嗎？",
+"老師，你剛剛在笑什麼？可以說給我聽嗎？",
+"這張圖片好漂亮喔，是哪裡拍的呢？",
+"老師，你為什麼會選擇這份工作呢？一定有什麼特別的理由吧。",
+"那個英文字母看起來好難喔，老師可以教我嗎？",
+"老師，你小時候的夢想是什麼呀？",
+"這個按鈕是做什麼用的？按下去會有什麼事發生嗎？",
+"你喜歡下雨天還是晴天？我比較喜歡晴天，可以曬太陽。",
+"老師有養過寵物嗎？牠們是什麼樣子的？",
+"剛剛好像有個新郵件進來了，是誰寄來的呢？",
+"老師，你覺得未來的生活會更方便嗎？",
+"這個看起來很複雜，老師是怎麼學會的呀？",
+],
 
-  // 表達困惑，提出疑問或自我思考
-  困惑: [
-    "嗯... 這個地方好像有點怪怪的，是我的錯覺嗎？",
-    "我有點不太明白，這句話是什麼意思呀？",
-    "這個數字怎麼會是這樣？好像跟我想的不一樣。",
-    "老師，你剛才說的那個，我有點跟不上耶...",
-    "咦？這個檔案跑到哪裡去了？我剛剛明明還看到的。",
-    "我需要再確認一下，這一步驟真的正確嗎？",
-    "為什麼會發生這樣的事情呢？完全沒有邏輯。",
-    "這好像是一個我沒有見過的指令，老師可以解釋一下嗎？",
-    "如果這樣做，結果會不會變得更糟？我有點擔心。",
-    "這讓我有點混亂，我需要一些時間來整理思緒。",
-    "這個問題的答案…好像有很多種可能性呢。",
-    "奇怪，這聲音是從哪裡傳來的？",
-    "我好像漏掉了什麼重要的資訊。",
-    "老師，這件事情…真的像我們看到的那麼簡單嗎？",
-  ],
+// 鼓勵老師，給予正向支持
+鼓勵: [
+"老師，加油喔！你做的很好，再努力一下下就好。",
+"沒問題的！彩奈相信老師一定能完成。",
+"如果遇到困難，不要灰心，慢慢來就好。",
+"老師，你已經很棒了，不要給自己太大的壓力。",
+"這一步很關鍵，但老師一定可以做到的！",
+"不管結果如何，過程中的努力才是最重要的。",
+"老師，不要放棄喔，彩奈會一直支持你的。",
+"再堅持一下下，離成功就不遠了！",
+"老師今天看起來特別有精神，一定能順利完成任務。",
+"有我在這裡，老師可以放心地往前走。",
+"別擔心，這點小問題一定難不倒老師的。",
+"老師，你的努力彩奈都看在眼裡喔。",
+"相信自己，你擁有的能力比想像中還要強大。",
+"即使失敗了也沒關係，從中學習才是最重要的。",
+],
 
-  // 看到美好的事物時，發出由衷的讚嘆
-  讚嘆: [
-    "哇！老師，這個真的太厲害了！",
-    "好漂亮喔！這簡直是藝術品嘛！",
-    "天啊，老師怎麼能想到這麼棒的方法？太聰明了！",
-    "沒想到會是這樣的結果，簡直是奇蹟！",
-    "老師，你剛才的操作好流暢喔，就像魔法一樣。",
-    "這個設計真的太有創意了，我完全被驚艷到了！",
-    "太不可思議了！這怎麼可能辦得到？",
-    "這景色…美到讓人說不出話來。",
-    "老師，你真的什麼都辦得到耶！好崇拜你喔！",
-    "我從來沒想過可以這樣做，真是大開眼界了。",
-    "這個成果太棒了，完全超出了我的預期！",
-    "老師，你簡直就是天才！",
-    "沒錯！就是這個感覺！好完美喔！",
-    "哇，真的好佩服老師的耐心和毅力。",
-  ],
+// 表達困惑，提出疑問或自我思考
+困惑: [
+"嗯... 這個地方好像有點怪怪的，是我的錯覺嗎？",
+"我有點不太明白，這句話是什麼意思呀？",
+"這個數字怎麼會是這樣？好像跟我想的不一樣。",
+"老師，你剛才說的那個，我有點跟不上耶...",
+"咦？這個檔案跑到哪裡去了？我剛剛明明還看到的。",
+"我需要再確認一下，這一步驟真的正確嗎？",
+"為什麼會發生這樣的事情呢？完全沒有邏輯。",
+"這好像是一個我沒有見過的指令，老師可以解釋一下嗎？",
+"如果這樣做，結果會不會變得更糟？我有點擔心。",
+"這讓我有點混亂，我需要一些時間來整理思緒。",
+"這個問題的答案…好像有很多種可能性呢。",
+"奇怪，這聲音是從哪裡傳來的？",
+"我好像漏掉了什麼重要的資訊。",
+"老師，這件事情…真的像我們看到的那麼簡單嗎？",
+],
+
+// 看到美好的事物時，發出由衷的讚嘆
+讚嘆: [
+"哇！老師，這個真的太厲害了！",
+"好漂亮喔！這簡直是藝術品嘛！",
+"天啊，老師怎麼能想到這麼棒的方法？太聰明了！",
+"沒想到會是這樣的結果，簡直是奇蹟！",
+"老師，你剛才的操作好流暢喔，就像魔法一樣。",
+"這個設計真的太有創意了，我完全被驚艷到了！",
+"太不可思議了！這怎麼可能辦得到？",
+"這景色…美到讓人說不出話來。",
+"老師，你真的什麼都辦得到耶！好崇拜你喔！",
+"我從來沒想過可以這樣做，真是大開眼界了。",
+"這個成果太棒了，完全超出了我的預期！",
+"老師，你簡直就是天才！",
+"沒錯！就是這個感覺！好完美喔！",
+"哇，真的好佩服老師的耐心和毅力。",
+],
+// 新增的點擊互動台詞
+被摸: [
+"老師，你摸我頭做什麼啦...嘿嘿。",
+"癢癢的！老師不要再摸了啦！",
+"老師的手…好溫暖喔。",
+"嗯？被老師發現了嗎？",
+"老師在觀察我嗎？彩奈會害羞的啦。",
+"嘿嘿，老師看起來心情很好呢。",
+],
 };
-
 
 // （可選）情境權重：想讓某些情境更常出現可調整下面數字（總和不限）
 const moodWeights = { 調皮: 3, 關心: 3, 閒聊: 4, 感嘆: 2, 神秘: 2 };
 function pickWeightedMood(weights){
-  const entries = Object.entries(weights);
-  const total = entries.reduce((s,[,w])=>s+w,0);
-  let t = Math.random()*total;
-  for(const [mood,w] of entries){ if((t-=w) <= 0) return mood; }
-  return entries[0][0];
+const entries = Object.entries(weights);
+const total = entries.reduce((s,[,w])=>s+w,0);
+let t = Math.random()*total;
+for(const [mood,w] of entries){ if((t-=w) <= 0) return mood; }
+return entries[0][0];
 }
 
 function setMoodBadge(mood){
-  const show = document.getElementById('showMood').checked;
-  const badge = document.getElementById('moodBadge');
-  if(show){ badge.style.display='inline-block'; badge.textContent = mood; }
-  else{ badge.style.display='none'; badge.textContent=''; }
+const show = document.getElementById('showMood').checked;
+const badge = document.getElementById('moodBadge');
+if(show){ badge.style.display='inline-block'; badge.textContent = mood; }
+else{ badge.style.display='none'; badge.textContent=''; }
 }
 
 let idleTimer=null;
 function resetIdleTimer(){
-  if(idleTimer) clearTimeout(idleTimer);
-  const sec = Math.max(3, parseInt(document.getElementById('idleSec').value)||10);
-  idleTimer=setTimeout(idleTalk, sec*1000);
+if(idleTimer) clearTimeout(idleTimer);
+const sec = Math.max(3, parseInt(document.getElementById('idleSec').value)||10);
+idleTimer=setTimeout(idleTalk, sec*1000);
 }
 
 function idleTalk(){
-  const mood = pickWeightedMood(moodWeights);
-  const sentence = rand(idlePhrases[mood]);
-  setMoodBadge(mood);
-  appendMessage('bot', sentence);
-  speakText(sentence);
-  resetIdleTimer();
+const mood = pickWeightedMood(moodWeights);
+const sentence = rand(idlePhrases[mood]);
+setMoodBadge(mood);
+appendMessage('bot', sentence);
+speakText(sentence);
+resetIdleTimer();
 }
+
+function pokeChayna(){
+// 停止目前的語音和計時器
+speechSynthesis.cancel();
+clearTimeout(idleTimer);
+// 隨機選一句被摸台詞
+const sentence = rand(idlePhrases.被摸);
+appendMessage('bot', sentence);
+speakText(sentence);
+// 說完後重設空閒計時器
+resetIdleTimer();
+}
+
 
 // ====================== 使用者輸入 ======================
 function getQAResponse(text){
-  const t = text.toLowerCase();
-  for(let qa of qaData){
-    for(let kw of qa.keywords){
-      if(t.includes(kw.toLowerCase())) return rand(qa.responses);
-    }
-  }
-  return null;
+const t = text.toLowerCase();
+for(let qa of qaData){
+for(let kw of qa.keywords){
+if(t.includes(kw.toLowerCase())) return rand(qa.responses);
+}
+}
+return null;
 }
 
 function handleUserMessage(text){
-  const qa = getQAResponse(text);
-  if(qa){
-    setTimeout(()=>{ appendMessage('bot',qa); speakText(qa); },300+Math.random()*500);
-  }else{
-    if(Math.random()<0.6){
-      const short=rand(["彩奈聽到了。","嗯…老師請繼續說。","原來如此。"]);
-      setTimeout(()=>{ appendMessage('bot',short); speakText(short); },300+Math.random()*500);
-    }
-  }
-  resetIdleTimer();
+const qa = getQAResponse(text);
+if(qa){
+setTimeout(()=>{ appendMessage('bot',qa); speakText(qa); },300+Math.random()*500);
+}else{
+if(Math.random()<0.6){
+const short=rand(["彩奈聽到了。","嗯…老師請繼續說。","原來如此。"]);
+setTimeout(()=>{ appendMessage('bot',short); speakText(short); },300+Math.random()*500);
+}
+}
+resetIdleTimer();
 }
 
 // 事件綁定
 const sendBtn = document.getElementById('sendBtn');
 const userInput = document.getElementById('userInput');
-sendBtn.onclick=()=>{ 
-  const text=userInput.value.trim();
-  if(!text) return;
-  appendMessage('user',text);
-  userInput.value='';
-  handleUserMessage(text);
-  resetIdleTimer();
+sendBtn.onclick=()=>{
+const text=userInput.value.trim();
+if(!text) return;
+appendMessage('user',text);
+userInput.value='';
+handleUserMessage(text);
+resetIdleTimer();
 };
 userInput.addEventListener('keypress', e=>{ if(e.key==='Enter') sendBtn.click(); });
 
@@ -347,39 +360,42 @@ document.getElementById('sampleBtn').onclick=()=>{ idleTalk(); resetIdleTimer();
 document.getElementById('stopBtn').onclick=()=>{ speechSynthesis.cancel(); speakingUtterance=null; moveCharacterRight(); };
 
 document.getElementById('showMood').addEventListener('change', ()=> setMoodBadge(''));
+// 新增點擊彩奈的事件監聽器
+character.addEventListener('click', pokeChayna);
+
 
 // ====================== 語音識別 ======================
 if('webkitSpeechRecognition' in window || 'SpeechRecognition' in window){
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.lang='zh-TW';
-  recognition.continuous=true;
-  recognition.interimResults=false;
-  recognition.onstart=()=>{ console.log("語音識別啟動"); }
-  recognition.onend=()=>{ recognition.start(); } // 自動重啟
-  recognition.onerror=e=>{ console.error("語音識別錯誤",e); }
-  recognition.onresult=(event)=>{
-    for(let i=event.resultIndex;i<event.results.length;i++){
-      if(event.results[i].isFinal){
-        const txt=event.results[i][0].transcript.trim();
-        if(txt){
-          appendMessage('user',txt);
-          handleUserMessage(txt);
-        }
-      }
-    }
-  }
-  recognition.start();
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang='zh-TW';
+recognition.continuous=true;
+recognition.interimResults=false;
+recognition.onstart=()=>{ console.log("語音識別啟動"); }
+recognition.onend=()=>{ recognition.start(); } // 自動重啟
+recognition.onerror=e=>{ console.error("語音識別錯誤",e); }
+recognition.onresult=(event)=>{
+for(let i=event.resultIndex;i<event.results.length;i++){
+if(event.results[i].isFinal){
+const txt=event.results[i][0].transcript.trim();
+if(txt){
+appendMessage('user',txt);
+handleUserMessage(txt);
+}
+}
+}
+}
+recognition.start();
 }
 
 // ====================== TTS選單 ======================
 function populateVoices(){
-  const select=document.getElementById('voiceSelect');
-  select.innerHTML='';
-  speechSynthesis.getVoices().forEach((v,i)=>{
-    const o=document.createElement('option'); o.value=i; o.textContent=v.name+' ('+v.lang+')';
-    select.appendChild(o);
-  });
+const select=document.getElementById('voiceSelect');
+select.innerHTML='';
+speechSynthesis.getVoices().forEach((v,i)=>{
+const o=document.createElement('option'); o.value=i; o.textContent=v.name+' ('+v.lang+')';
+select.appendChild(o);
+});
 }
 speechSynthesis.onvoiceschanged=populateVoices;
 populateVoices();
@@ -387,4 +403,5 @@ populateVoices();
 // 啟動空閒計時
 resetIdleTimer();
 </script></body>
-</html>
+
+</html>  
