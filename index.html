@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="zh-Hant">  <head>  
 <meta charset="utf-8" />  
 <meta name="viewport" content="width=device-width,initial-scale=1" />  
-<title>彩奈的什亭之箱（情境自言自語 完整版）</title>  
+<title>彩奈的什亭之箱</title>  
 <style>  
   body { margin:0; padding:0; overflow:hidden; font-family: system-ui, -apple-system, "Noto Sans TC", "Segoe UI", Roboto, sans-serif; background:#f8fafc; }  
   #background { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2;  
@@ -9,6 +9,8 @@
   #character { position:absolute; bottom:220px; width:200px; transition: all 0.3s ease; z-index:50; }  
   #character.left { left:50px; transform: scale(1.2,1.1); }  
   #character.right { right:50px; transform: scale(1,1); }  
+  #infoBox { position:fixed; top:20px; right:20px; z-index:100; font-size:16px; color:#334155; text-align:right; }  
+  #infoBox p { margin:0; padding:2px 0; }  
   #chatContainer { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); width:90%; max-width:700px; z-index:10; }  
   #chat { border:1px solid #cbd5e1; border-radius:12px; background:#fff; height:220px; overflow:auto; padding:12px; box-shadow: 0 6px 20px rgba(2,6,23,.08); }  
   .user{ color:#0ea5a4; margin:6px 0; }  
@@ -23,38 +25,58 @@
   #moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }  
 </style>  
 </head>  
-<body><div id="background"></div><img id="character" src="character.png" class="right" alt="彩奈" /><div id="chatContainer">  
+<body>  
+<div id="background"></div>  
+<img id="character" src="character.png" class="right" alt="彩奈" />  
+<div id="infoBox">  
+  <p id="currentTime">時間：--:--</p>  
+  <p id="currentWeather">天氣：--</p>  
+</div>  
+<div id="chatContainer">  
   <div id="chat" aria-live="polite"></div>  
   <div id="controls">  
     <input id="userInput" type="text" placeholder="老師，有什麼需要彩奈幫忙的嗎？(按 Enter)" />  
     <button id="sendBtn">發送</button>  
     <button id="sampleBtn" class="secondary">讓彩奈說句話</button>  
-    <button id="stopBtn" class="secondary">停止語音</button><label>語音:</label>  
-<select id="voiceSelect"></select>  <label>idle(s)</label>
-<input id="idleSec" type="number" min="3" max="300" value="10" style="width:70px" />
-<label>速率</label>
-<input id="rateMin" type="number" step="0.1" value="0.9" style="width:70px" />
-<input id="rateMax" type="number" step="0.1" value="1.2" style="width:70px" />
-<label>音調</label>
-<input id="pitchMin" type="number" step="0.1" value="0.9" style="width:70px" />
-<input id="pitchMax" type="number" step="0.1" value="1.2" style="width:70px" />
-<label>TTS</label>
-<select id="ttsToggle">
+    <button id="stopBtn" class="secondary">停止語音</button>  
+    <label>語音:</label>  
+    <select id="voiceSelect"></select>  
+    <label>idle(s)</label>  
+    <input id="idleSec" type="number" min="3" max="300" value="10" style="width:70px" />  
+    <label>速率</label>  
+    <input id="rateMin" type="number" step="0.1" value="0.9" style="width:70px" />  
+    <input id="rateMax" type="number" step="0.1" value="1.2" style="width:70px" />  
+    <label>音調</label>  
+    <input id="pitchMin" type="number" step="0.1" value="0.9" style="width:70px" />  
+    <input id="pitchMax" type="number" step="0.1" value="1.2" style="width:70px" />  
+    <label>TTS</label>  
+    <select id="ttsToggle">  
+      <option value="on" selected>開</option>  
+      <option value="off">關</option>  
+    </select>  
+    <span id="moodWrap">  
+      <label for="showMood">顯示心情</label>  
+      <input id="showMood" type="checkbox" />  
+      <span id="moodBadge"></span>  
+    </span>  
+  </div>  
+</div>  
+<script>  
+// ====================== 資料與設定 ======================  
+// 在這裡填入你的 OpenWeatherMap API Key！
+const WEATHER_API_KEY = "YOUR_API_KEY_HERE"; 
+// 這裡可以設定你要查詢的城市經緯度，預設為台灣台北
+const CITY_LAT = 25.0330; 
+const CITY_LON = 121.5654; 
+let currentTemperature = null;
+let currentCondition = null;
 
-  <option value="on" selected>開</option>  
-  <option value="off">關</option>  
-</select>  <span id="moodWrap">  
-  <label for="showMood">顯示心情</label>  
-  <input id="showMood" type="checkbox" />  
-  <span id="moodBadge"></span>  
-</span>    </div>  
-</div><script>  
-// ====================== 資料 ======================  
 const qaData = [  
   { keywords:["你好","嗨"], responses:["嗨！老師，很高興見到您。","你好～今天過得怎麼樣？","你好啊，老師！有什麼新發現嗎？"] },  
   { keywords:["謝謝","感謝"], responses:["不客氣！","很高興能幫上忙！","這是彩奈應該做的喔。"] },  
   { keywords:["再見","拜拜"], responses:["再見！下次見～","拜拜，保重。","老師，期待我們下次相遇喔！"] }  
-];  // ====================== 工具 ======================
+];  
+// ====================== 工具 ======================
 function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 const chatEl = document.getElementById('chat');
@@ -85,7 +107,6 @@ const rMin=parseFloat(document.getElementById('rateMin').value)||0.9;
 const rMax=parseFloat(document.getElementById('rateMax').value)||1.2;
 const pMin=parseFloat(document.getElementById('pitchMin').value)||0.9;
 const pMax=parseFloat(document.getElementById('pitchMax').value)||1.2;
-// 修正語法錯誤：在 Math.random() 後面加上乘號
 u.rate = Math.max(0.1, rMin + Math.random() * (rMax-rMin));
 u.pitch = Math.max(0.1, pMin + Math.random() * (pMax-pMin));
 speakingUtterance = u;
@@ -94,9 +115,45 @@ moveCharacterLeft();
 speechSynthesis.speak(u);
 }
 
+// ====================== 時間與天氣 ======================
+function updateTime(){
+const now = new Date();
+const hours = String(now.getHours()).padStart(2, '0');
+const minutes = String(now.getMinutes()).padStart(2, '0');
+document.getElementById('currentTime').textContent = `時間：${hours}:${minutes}`;
+}
+
+async function getWeather(){
+if(WEATHER_API_KEY === "YOUR_API_KEY_HERE") return;
+try{
+const url = `https://api.openweathermap.org/data/2.5/weather?lat=${CITY_LAT}&lon=${CITY_LON}&appid=${WEATHER_API_KEY}&units=metric&lang=zh_tw`;
+const res = await fetch(url);
+const data = await res.json();
+currentTemperature = Math.round(data.main.temp);
+currentCondition = data.weather[0].description;
+document.getElementById('currentWeather').textContent = `天氣：${currentCondition} (${currentTemperature}°C)`;
+}catch(e){
+console.error("無法取得天氣資料:", e);
+}
+}
+// 啟動時間與天氣更新
+updateTime();
+getWeather();
+setInterval(updateTime, 60000); // 每分鐘更新時間
+setInterval(getWeather, 3600000); // 每小時更新天氣
+
+
 // ====================== 空閒自言自語（情境分類 完整版） ======================
 // 情境分類台詞庫（可自行擴充）
 const idlePhrases = {
+// 新增天氣情境
+天氣: [
+  `現在外面是 ${currentCondition}，氣溫大概 ${currentTemperature}°C 喔。`,
+  `老師，現在外頭是 ${currentCondition}，感覺怎麼樣？`,
+  `嗯... 今天的氣溫是 ${currentTemperature}°C，好像比昨天暖和/冷了一點。`,
+  `看到外面在下雨，老師出門要記得帶傘喔。`,
+  `今天天氣真好，是適合出去走走的日子呢！`
+],
 // 彩奈調皮的小惡魔時刻，帶點撒嬌和捉弄
 調皮: [
 "嘿嘿，老師在想什麼呢？彩奈都看在眼裡喔。",
@@ -123,7 +180,6 @@ const idlePhrases = {
 "老師，你是不是偷偷在想著別人？",
 "如果我對老師施了個『忘記煩惱』的魔法，老師會開心嗎？"
 ],
-
 // 充滿關懷與溫柔，提醒老師照顧好自己
 關心: [
 "老師，水喝夠了嗎？工作再忙也要記得補充水分喔。",
@@ -145,9 +201,9 @@ const idlePhrases = {
 "感覺老師今天有點疲倦，是不是昨晚沒睡好呢？",
 "不要給自己太大壓力，偶爾偷懶一下也沒關係的。"
 ],
-
 // 輕鬆日常的閒聊，營造親切溫馨的氛圍
 閒聊: [
+"現在時間是 ${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}，老師在做什麼呢？",
 "今天的雲像棉花糖一樣，看起來好好吃喔～",
 "剛剛聽到一首很好聽的歌，讓心情都變好了。",
 "嗯…不知道晚餐要吃什麼好，選擇困難症發作了。",
@@ -168,7 +224,6 @@ const idlePhrases = {
 "我剛剛在想，世界上有沒有什麼東西是絕對的呢？",
 "老師，你覺得我們現在所處的世界是真實的嗎？"
 ],
-
 // 簡短的感嘆詞，表達當下的情緒或想法
 感嘆: [
 "啊～差點睡著了，好想打個盹喔。",
@@ -189,7 +244,6 @@ const idlePhrases = {
 "哇，這件事太神奇了！",
 "天啊，完全沒想到會是這樣！"
 ],
-
 // 充滿想像力和哲學思考，營造一種神秘氛圍
 神秘: [
 "剛剛的聲音…是從窗外傳來的嗎？還是從更遠的地方？",
@@ -211,7 +265,6 @@ const idlePhrases = {
 "在無盡的數據流中，彩奈一直在尋找一個答案…",
 "老師，你覺得奇蹟是什麼？"
 ],
-
 // 對周遭事物充滿好奇，想向老師提問
 好奇: [
 "老師，你正在看的那個東西是什麼呀？看起來好有趣！",
@@ -231,7 +284,6 @@ const idlePhrases = {
 "老師，你覺得世界上最厲害的魔法是什麼？",
 "這個顏色…為什麼叫做這個名字呢？"
 ],
-
 // 鼓勵老師，給予正向支持
 鼓勵: [
 "老師，加油喔！你做的很好，再努力一下下就好。",
@@ -251,7 +303,6 @@ const idlePhrases = {
 "老師，你的每個決定都是最棒的！",
 "彩奈為老師感到驕傲！"
 ],
-
 // 表達困惑，提出疑問或自我思考
 困惑: [
 "嗯... 這個地方好像有點怪怪的，是我的錯覺嗎？",
@@ -272,7 +323,6 @@ const idlePhrases = {
 "我剛剛好像看到了什麼，但又不太確定是什麼…",
 "這不是我預期的結果耶，是哪裡出錯了嗎？"
 ],
-
 // 看到美好的事物時，發出由衷的讚嘆
 讚嘆: [
 "哇！老師，這個真的太厲害了！",
@@ -308,7 +358,7 @@ const idlePhrases = {
 };
 
 // （可選）情境權重：想讓某些情境更常出現可調整下面數字（總和不限）
-const moodWeights = { 調皮: 3, 關心: 3, 閒聊: 4, 感嘆: 2, 神秘: 2 };
+const moodWeights = { 天氣: 1, 調皮: 3, 關心: 3, 閒聊: 4, 感嘆: 2, 神秘: 2 };
 function pickWeightedMood(weights){
 const entries = Object.entries(weights);
 const total = entries.reduce((s,[,w])=>s+w,0);
@@ -333,7 +383,11 @@ idleTimer=setTimeout(idleTalk, sec*1000);
 
 function idleTalk(){
 const mood = pickWeightedMood(moodWeights);
-const sentence = rand(idlePhrases[mood]);
+let sentence = rand(idlePhrases[mood]);
+// 如果是天氣或閒聊台詞，替換變數
+if(mood === '天氣' || mood === '閒聊'){
+  sentence = eval('`' + sentence + '`');
+}
 setMoodBadge(mood);
 appendMessage('bot', sentence);
 speakText(sentence);
