@@ -36,7 +36,7 @@
   .moodWrap{ display:flex; align-items:center; gap:6px; margin-left:auto; }
   .moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }
 
-  /* 新增的網址輸入框樣式 */
+  /* 網址輸入框樣式 */
   #urlInputContainer {
     position: absolute;
     bottom: 240px;
@@ -98,7 +98,7 @@
 </div>
 
 <div id="urlInputContainer">
-  <input id="urlInput" type="text" placeholder="輸入網址（例如：https://zh.wikipedia.org）" value="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" />
+  <input id="urlInput" type="text" placeholder="輸入網址（例如：https://zh.wikipedia.org）" value="https://www.bilibili.com/" />
   <button id="goBtn">前往</button>
 </div>
 
@@ -592,6 +592,7 @@ function handleUserMessage(text, charName) {
       setTimeout(() => { appendMessage(charName, short, chatEl); speakText(short); }, 300 + Math.random() * 500);
     }
   }
+  // 互動後重設計時器
   resetIdleTimer(charName);
 }
 
