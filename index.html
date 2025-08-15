@@ -359,24 +359,32 @@ function appendMessage(who, text, chatEl) {
 let currentUtterance = null;
 function speakText(text) {
   // 這裡我們只使用一個全域的語音開關
-  if (document.getElementById('ttsToggle').value === 'off') return;
+  const ttsToggle = document.getElementById('ttsToggle');
+  if (ttsToggle && ttsToggle.value === 'off') return;
+  
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'zh-TW';
-  // 這裡假設我們只使用一個語音設定
+  
+  // 這裡我們只使用一個語音設定
   const voices = speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    // 這裡我們不使用下拉式選單，直接選一個中文語音
-    const defaultVoice = voices.find(v => v.lang.includes('zh'));
-    if (defaultVoice) {
-      u.voice = defaultVoice;
-    }
+  const voiceSelect = document.getElementById('voiceSelect');
+  if (voiceSelect && voices[parseInt(voiceSelect.value)]) {
+      u.voice = voices[parseInt(voiceSelect.value)];
+  } else if (voices.length > 0) {
+      const defaultVoice = voices.find(v => v.lang.includes('zh'));
+      if (defaultVoice) u.voice = defaultVoice;
   }
 
-  const rMin = parseFloat(document.getElementById('chaynaRateMin')?.value || '0.9');
-  const rMax = parseFloat(document.getElementById('chaynaRateMax')?.value || '1.2');
-  const pMin = parseFloat(document.getElementById('chaynaPitchMin')?.value || '0.9');
-  const pMax = parseFloat(document.getElementById('chaynaPitchMax')?.value || '1.2');
+  const rateMinEl = document.getElementById('rateMin');
+  const rateMaxEl = document.getElementById('rateMax');
+  const pitchMinEl = document.getElementById('pitchMin');
+  const pitchMaxEl = document.getElementById('pitchMax');
+
+  const rMin = parseFloat(rateMinEl?.value || '0.9');
+  const rMax = parseFloat(rateMaxEl?.value || '1.2');
+  const pMin = parseFloat(pitchMinEl?.value || '0.9');
+  const pMax = parseFloat(pitchMaxEl?.value || '1.2');
   
   u.rate = Math.max(0.1, rMin + Math.random() * (rMax - rMin));
   u.pitch = Math.max(0.1, pMin + Math.random() * (pMax - pMin));
@@ -392,7 +400,8 @@ function updateTime() {
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById('currentTime').textContent = `時間：${hours}:${minutes}`;
+  const currentTimeEl = document.getElementById('currentTime');
+  if (currentTimeEl) currentTimeEl.textContent = `時間：${hours}:${minutes}`;
 }
 
 async function getWeather() {
@@ -403,7 +412,8 @@ async function getWeather() {
     const data = await res.json();
     currentTemperature = Math.round(data.main.temp);
     currentCondition = data.weather[0].description;
-    document.getElementById('currentWeather').textContent = `天氣：${currentCondition} (${currentTemperature}°C)`;
+    const currentWeatherEl = document.getElementById('currentWeather');
+    if (currentWeatherEl) currentWeatherEl.textContent = `天氣：${currentCondition} (${currentTemperature}°C)`;
   } catch (e) {
     console.error("無法取得天氣資料:", e);
   }
@@ -428,6 +438,7 @@ function pickWeightedMood(weights) {
 function idleTalk(charName) {
   let mood, sentence;
   let chatEl, phrases, weights;
+  
   if (charName === '彩奈') {
     phrases = idlePhrasesChayna;
     weights = moodWeightsChayna;
@@ -438,6 +449,8 @@ function idleTalk(charName) {
     chatEl = document.getElementById('planaChat');
   }
   
+  if (!chatEl) return;
+  
   mood = pickWeightedMood(weights);
   sentence = rand(phrases[mood]);
 
@@ -447,11 +460,14 @@ function idleTalk(charName) {
   
   const showMoodInput = document.getElementById(`${charName.toLowerCase()}ShowMood`);
   const moodBadgeEl = document.getElementById(`${charName.toLowerCase()}MoodBadge`);
-  if (showMoodInput.checked) {
-    moodBadgeEl.style.display = 'inline-block';
-    moodBadgeEl.textContent = mood;
-  } else {
-    moodBadgeEl.style.display = 'none';
+  
+  if (showMoodInput && moodBadgeEl) {
+    if (showMoodInput.checked) {
+      moodBadgeEl.style.display = 'inline-block';
+      moodBadgeEl.textContent = mood;
+    } else {
+      moodBadgeEl.style.display = 'none';
+    }
   }
   
   appendMessage(charName, sentence, chatEl);
@@ -463,7 +479,8 @@ const idleTimers = { '彩奈': null, '普拉娜': null };
 function resetIdleTimer(charName) {
   if (idleTimers[charName]) clearTimeout(idleTimers[charName]);
   const idleSecEl = document.getElementById(`${charName.toLowerCase()}IdleSec`);
-  const sec = Math.max(3, parseInt(idleSecEl?.value || '10'));
+  if (!idleSecEl) return;
+  const sec = Math.max(3, parseInt(idleSecEl.value) || 10);
   idleTimers[charName] = setTimeout(() => idleTalk(charName), sec * 1000);
 }
 
@@ -478,6 +495,8 @@ function pokeCharacter(charName) {
     chatEl = document.getElementById('planaChat');
   }
   
+  if (!chatEl) return;
+  
   speechSynthesis.cancel();
   clearTimeout(idleTimers[charName]);
   sentence = rand(phrases.被摸);
@@ -490,6 +509,8 @@ function pokeCharacter(charName) {
 // ====================== 使用者輸入 ======================
 function handleUserMessage(text, charName) {
   let chatEl = document.getElementById(`${charName.toLowerCase()}Chat`);
+  if (!chatEl) return;
+  
   const qaData = [  
     { keywords:["你好","嗨"], responses:["嗨！老師，很高興見到您。","你好～今天過得怎麼樣？","你好啊，老師！有什麼新發現嗎？"] },  
     { keywords:["謝謝","感謝"], responses:["不客氣！","很高興能幫上忙！","這是彩奈應該做的喔。"] },  
@@ -521,18 +542,20 @@ function getQAResponse(text, data) {
 
 // 事件綁定
 document.getElementById('chaynaSendBtn').onclick = () => {
-  const text = document.getElementById('chaynaInput').value.trim();
+  const chaynaInputEl = document.getElementById('chaynaInput');
+  const text = chaynaInputEl.value.trim();
   if (!text) return;
   appendMessage('user', text, document.getElementById('chaynaChat'));
-  document.getElementById('chaynaInput').value = '';
+  chaynaInputEl.value = '';
   handleUserMessage(text, '彩奈');
 };
 
 document.getElementById('planaSendBtn').onclick = () => {
-  const text = document.getElementById('planaInput').value.trim();
+  const planaInputEl = document.getElementById('planaInput');
+  const text = planaInputEl.value.trim();
   if (!text) return;
   appendMessage('user', text, document.getElementById('planaChat'));
-  document.getElementById('planaInput').value = '';
+  planaInputEl.value = '';
   handleUserMessage(text, '普拉娜');
 };
 
@@ -546,10 +569,12 @@ document.getElementById('chaynaStopBtn').onclick = () => { speechSynthesis.cance
 document.getElementById('planaStopBtn').onclick = () => { speechSynthesis.cancel(); clearTimeout(idleTimers['普拉娜']); };
 
 document.getElementById('chaynaShowMood').addEventListener('change', () => {
-  if (!document.getElementById('chaynaShowMood').checked) document.getElementById('chaynaMoodBadge').style.display = 'none';
+  const moodBadgeEl = document.getElementById('chaynaMoodBadge');
+  if (!document.getElementById('chaynaShowMood').checked && moodBadgeEl) moodBadgeEl.style.display = 'none';
 });
 document.getElementById('planaShowMood').addEventListener('change', () => {
-  if (!document.getElementById('planaShowMood').checked) document.getElementById('planaMoodBadge').style.display = 'none';
+  const moodBadgeEl = document.getElementById('planaMoodBadge');
+  if (!document.getElementById('planaShowMood').checked && moodBadgeEl) moodBadgeEl.style.display = 'none';
 });
 
 
@@ -559,67 +584,3 @@ document.getElementById('planaCharacter').addEventListener('click', () => pokeCh
 
 // 語音識別 (這裡我們假設只有一個語音輸入源)
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'zh-TW';
-  recognition.continuous = true;
-  recognition.interimResults = false;
-  recognition.onend = () => { recognition.start(); }
-  recognition.onerror = e => { console.error("語音識別錯誤", e); }
-  recognition.onresult = (event) => {
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        const txt = event.results[i][0].transcript.trim();
-        if (txt) {
-          // 將語音輸入同時發送給兩個角色
-          appendMessage('user', txt, document.getElementById('chaynaChat'));
-          appendMessage('user', txt, document.getElementById('planaChat'));
-          // 讓彩奈先回應
-          handleUserMessage(txt, '彩奈');
-        }
-      }
-    }
-  }
-  recognition.start();
-}
-
-// TTS選單與語音設定 (這裡我們只使用一個共用的設定)
-const voiceSelectHTML = `
-  <label>語音:</label>
-  <select id="voiceSelect"></select>
-  <label>速率</label>
-  <input id="chaynaRateMin" type="number" step="0.1" value="0.9" style="width:70px" />
-  <input id="chaynaRateMax" type="number" step="0.1" value="1.2" style="width:70px" />
-  <label>音調</label>
-  <input id="chaynaPitchMin" type="number" step="0.1" value="0.9" style="width:70px" />
-  <input id="chaynaPitchMax" type="number" step="0.1" value="1.2" style="width:70px" />
-  <label>TTS</label>
-  <select id="ttsToggle">
-    <option value="on" selected>開</option>
-    <option value="off">關</option>
-  </select>
-`;
-
-// 在兩個控制面板前加上共用設定
-const chaynaControls = document.querySelector('#chaynaContainer .controls');
-chaynaControls.insertAdjacentHTML('beforebegin', voiceSelectHTML);
-
-function populateVoices() {
-  const select = document.getElementById('voiceSelect');
-  select.innerHTML = '';
-  speechSynthesis.getVoices().forEach((v, i) => {
-    const o = document.createElement('option');
-    o.value = i;
-    o.textContent = v.name + ' (' + v.lang + ')';
-    select.appendChild(o);
-  });
-}
-speechSynthesis.onvoiceschanged = populateVoices;
-populateVoices();
-
-// 啟動空閒計時
-resetIdleTimer('彩奈');
-resetIdleTimer('普拉娜');
-</script>
-</body>
-</html>
