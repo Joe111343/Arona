@@ -744,8 +744,10 @@ speechSynthesis.onvoiceschanged = populateVoices;
 populateVoices();
 
 // 啟動空閒計時
-resetIdleTimer('彩奈');
-resetIdleTimer('普拉娜');
+document.addEventListener('DOMContentLoaded', () => {
+    resetIdleTimer('彩奈');
+    resetIdleTimer('普拉娜');
+});
 </script>
 </body>
 </html>
