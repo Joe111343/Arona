@@ -85,8 +85,9 @@ const rMin=parseFloat(document.getElementById('rateMin').value)||0.9;
 const rMax=parseFloat(document.getElementById('rateMax').value)||1.2;
 const pMin=parseFloat(document.getElementById('pitchMin').value)||0.9;
 const pMax=parseFloat(document.getElementById('pitchMax').value)||1.2;
-u.rate = Math.max(0.1, rMin + Math.random()(rMax-rMin));
-u.pitch = Math.max(0.1, pMin + Math.random()(pMax-pMin));
+// 修正語法錯誤：在 Math.random() 後面加上乘號
+u.rate = Math.max(0.1, rMin + Math.random() * (rMax-rMin));
+u.pitch = Math.max(0.1, pMin + Math.random() * (pMax-pMin));
 speakingUtterance = u;
 u.onend = ()=>{ speakingUtterance=null; moveCharacterRight(); };
 moveCharacterLeft();
