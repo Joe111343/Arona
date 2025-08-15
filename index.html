@@ -3,104 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>彩奈與普拉娜</title>
+    <title>與彩奈和普拉娜對話 (情境與多樣化回應版)</title>
     <style>
-        /* CSS 樣式開始 */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+        body {
             font-family: 'Arial', sans-serif;
-        }
-        
-        .background-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('images/B.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: -1;
-        }
-        
-        .characters-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
+            background-color: #f0f4f8;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-        
-        .character-C, .character-P {
-            max-width: 30vw;
-            height: auto;
-            object-fit: contain;
-            position: absolute;
+        .chat-box {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 70vh;
         }
-        
-        .character-C {
-            top: 50%;
-            left: 40%;
-            transform: translate(-50%, -50%);
+        .message {
+            padding: 10px 15px;
+            border-radius: 12px;
+            max-width: 80%;
         }
-        
-        .character-P {
-            top: 50%;
-            left: 60%;
-            transform: translate(-50%, -50%);
+        .user-message {
+            background-color: #e0e7ff;
+            align-self: flex-end;
+            text-align: right;
         }
-        
-        @media (max-width: 768px) {
-            .character-C, .character-P {
-                max-width: 45vw;
-            }
-        
-            .character-C {
-                top: 40%;
-                left: 50%;
-            }
-        
-            .character-P {
-                top: 60%;
-                left: 50%;
-            }
+        .ai-message {
+            background-color: #f1f1f1;
+            align-self: flex-start;
         }
-        /* CSS 樣式結束 */
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background-color: #4a90e2;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #357bd8;
+        }
+        select {
+            padding: 10px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        .listening-status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #888;
+        }
     </style>
 </head>
 <body>
-    <div class="background-container"></div>
-    
-    <div class="characters-container">
-        <img src="images/C.png" alt="彩奈" class="character-C">
-        <img src="images/P.png" alt="普拉娜" class="character-P">
+
+    <h1>與彩奈和普拉娜的對話</h1>
+    <div class="chat-box" id="chat-box">
+        <div class="message ai-message">
+            <p><strong>普拉娜：</strong>你好，老師。準備好開始了嗎？</p>
+        </div>
     </div>
+    <div class="buttons">
+        <select id="voice-teacher"></select>
+        <select id="voice-chana"></select>
+        <select id="voice-plana"></select>
+        <button id="start-btn">開始對話</button>
+        <button id="stop-btn">停止對話</button>
+    </div>
+    <div class="listening-status" id="status"></div>
 
     <script>
-        // JavaScript 程式碼開始
-        document.addEventListener('mousemove', (e) => {
-            const characterC = document.querySelector('.character-C');
-            const characterP = document.querySelector('.character-P');
+        const chatBox = document.getElementById('chat-box');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const statusDiv = document.getElementById('status');
+        const voiceSelectTeacher = document.getElementById('voice-teacher');
+        const voiceSelectChana = document.getElementById('voice-chana');
+        const voiceSelectPlana = document.getElementById('voice-plana');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const SpeechSynthesis = window.speechSynthesis;
+
+        const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+        const synth = SpeechSynthesis;
+
+        let selectedVoices = {
+            'teacher': null,
+            '彩奈': null,
+            '普拉娜': null
+        };
+        
+        let conversationData = {};
+
+        // 預設的對話內容，關鍵字和回應都更多
+        const defaultConversationData = {
+            '你好|哈囉|嗨': { speaker: '彩奈', responses: ['你好，老師！很高興能和您說話。', '嗨，老師！今天過得怎麼樣？'] },
+            '天氣|熱|冷': { speaker: '普拉娜', responses: ['普拉娜查了一下，今天天氣晴朗，很適合出門走走喔！', '聽老師的聲音，好像有點冷呢？要多穿一點喔。'] },
+            '名字|你是誰': { speaker: '彩奈', responses: ['我是彩奈，他是普拉娜，我們是您的嚮導喔。', '我們是為老師服務的AI。'] },
+            '時間': { speaker: '普拉娜', responses: [() => {
+                const now = new Date();
+                return `現在時間是 ${now.getHours()} 點 ${now.getMinutes()} 分。`;
+            }, '普拉娜剛剛看了一下，現在是正確的時間。'] },
+            '喜歡|愛': { speaker: '彩奈', responses: ['老師說「喜歡」，我...我...我也一樣喔！', '真的嗎？太好了！彩奈會一直努力的！'] },
+            '吃飯|肚子餓|午餐|晚餐': { speaker: '隨機', responses: ['老師肚子餓了嗎？要不要一起去吃飯？', '我們去吃點東西補充一下能量吧！', '我已經準備好菜單了喔！'] },
+            '早安|早上好': { speaker: '彩奈', responses: ['早安，老師！新的一天也要充滿活力喔！', '老師早安，今天有什麼計畫嗎？'] },
+            '晚安': { speaker: '普拉娜', responses: ['晚安，老師。願您有個好夢。', '好好休息吧，老師，明天見！'] },
+            '老師': { speaker: '彩奈', responses: ['老師是我們最棒的老師！', '有什麼需要幫忙的嗎，老師？'] },
+            '可愛': { speaker: '普拉娜', responses: ['謝謝老師，這是普拉娜聽過最棒的稱讚了！', '能被老師稱讚，好開心。', '這...這是老師的稱讚嗎？我會害羞的！'] },
+            '辛苦': { speaker: '彩奈', responses: ['老師今天辛苦了！好好休息一下吧。', '沒事，有我們在！', '老師，您辛苦了，真的。'] },
+            '無聊|好無聊': { speaker: '普拉娜', responses: ['老師覺得無聊嗎？要不要聽普拉娜說個故事？', '沒事，普拉娜可以陪老師聊天喔。'] },
+            '遊戲|玩遊戲': { speaker: '彩奈', responses: ['老師想玩遊戲嗎？我已經準備好最新的遊戲清單了！', '玩遊戲可以放鬆心情喔。'] },
+            '工作|忙': { speaker: '普拉娜', responses: ['老師工作很忙嗎？要記得休息喔，普拉娜會為您加油的。', '工作再忙也要記得喝水喔。'] },
+            '再見|掰掰': { speaker: '隨機', responses: ['再見，老師！期待下次見面。', '下次再見囉！', '老師，我會在這裡等您回來喔。'] },
+            'fallback': { speaker: '隨機', responses: [
+                '我還不明白您的意思，可以再說一次嗎？',
+                '唔...這個問題對普拉娜來說有點難解讀呢。',
+                '老師說的話，我好像沒聽清楚。',
+                '這是新的指令嗎？請說得更清楚一點。'
+            ]}
+        };
+
+        function loadConversationData() {
+            const storedData = localStorage.getItem('conversationData');
+            if (storedData) {
+                conversationData = JSON.parse(storedData);
+            } else {
+                conversationData = defaultConversationData;
+                saveConversationData();
+            }
+        }
+
+        function saveConversationData() {
+            localStorage.setItem('conversationData', JSON.stringify(conversationData));
+        }
+
+        loadConversationData();
+
+        if (recognition) {
+            recognition.lang = 'zh-TW';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+        }
+        
+        async function speak(text, name, repeat = false) {
+            const utterance = new SpeechSynthesisUtterance();
+            utterance.text = text;
+            utterance.lang = 'zh-TW';
             
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
+            if (selectedVoices[name]) {
+                utterance.voice = selectedVoices[name];
+            } else {
+                const defaultVoice = synth.getVoices().find(voice => voice.lang.includes('zh'));
+                if (defaultVoice) {
+                    utterance.voice = defaultVoice;
+                }
+            }
+
+            return new Promise((resolve) => {
+                utterance.onend = () => {
+                    if (!repeat) {
+                        speak(text, name, true).then(resolve);
+                    } else {
+                        resolve();
+                    }
+                };
+                synth.speak(utterance);
+            });
+        }
         
-            const mouseX = e.clientX - windowWidth / 2;
-            const mouseY = e.clientY - windowHeight / 2;
+        function addMessageToChat(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            const senderName = sender === 'user' ? '你 (老師)' : (sender === '彩奈' ? '彩奈' : '普拉娜');
+            
+            if (sender === 'user') {
+                messageDiv.classList.add('user-message');
+                messageDiv.innerHTML = `<p><strong>${senderName}：</strong>${text}</p>`;
+            } else {
+                messageDiv.classList.add('ai-message');
+                messageDiv.innerHTML = `<p><strong>${senderName}：</strong>${text}</p>`;
+            }
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function populateVoiceList() {
+            const voices = synth.getVoices().filter(voice => voice.lang.includes('zh'));
+            voiceSelectTeacher.innerHTML = '<option value="">選擇老師的聲音</option>';
+            voiceSelectChana.innerHTML = '<option value="">選擇彩奈的聲音</option>';
+            voiceSelectPlana.innerHTML = '<option value="">選擇普拉娜的聲音</option>';
+
+            if (voices.length > 0) {
+                voices.forEach(voice => {
+                    const optionTeacher = new Option(voice.name, voice.name);
+                    const optionChana = new Option(voice.name, voice.name);
+                    const optionPlana = new Option(voice.name, voice.name);
+                    voiceSelectTeacher.add(optionTeacher);
+                    voiceSelectChana.add(optionChana);
+                    voiceSelectPlana.add(optionPlana);
+                });
+            } else {
+                voiceSelectTeacher.disabled = true;
+                voiceSelectChana.disabled = true;
+                voiceSelectPlana.disabled = true;
+                alert('您的瀏覽器沒有可用的中文語音，語音合成功能將會受限。');
+            }
+        }
         
-            const movementC = 0.05;
-            const movementP = -0.05;
-        
-            characterC.style.transform = `translate(-50%, -50%) translate(${mouseX * movementC}px, ${mouseY * movementC}px)`;
-            characterP.style.transform = `translate(-50%, -50%) translate(${mouseX * movementP}px, ${mouseY * movementP}px)`;
+        populateVoiceList();
+        if (SpeechSynthesis.onvoiceschanged !== undefined) {
+            SpeechSynthesis.onvoiceschanged = populateVoiceList;
+        }
+
+        voiceSelectTeacher.addEventListener('change', () => {
+            selectedVoices.teacher = synth.getVoices().find(v => v.name === voiceSelectTeacher.value);
         });
-        // JavaScript 程式碼結束
+        voiceSelectChana.addEventListener('change', () => {
+            selectedVoices.彩奈 = synth.getVoices().find(v => v.name === voiceSelectChana.value);
+        });
+        voiceSelectPlana.addEventListener('change', () => {
+            selectedVoices.普拉娜 = synth.getVoices().find(v => v.name === voiceSelectPlana.value);
+        });
+
+        if (recognition) {
+            recognition.onresult = async (event) => {
+                const last = event.results.length - 1;
+                const text = event.results[last][0].transcript;
+                
+                addMessageToChat(text, 'user');
+                await speak(text, 'teacher');
+                
+                handleResponse(text);
+            };
+
+            recognition.onstart = () => {
+                statusDiv.textContent = '正在聆聽中...請說話';
+            };
+
+            recognition.onend = () => {
+                statusDiv.textContent = '語音辨識已停止。';
+            };
+
+            recognition.onerror = (event) => {
+                statusDiv.textContent = `錯誤: ${event.error}`;
+            };
+        }
+
+        async function handleResponse(text) {
+            let matched = false;
+            let responseText = '';
+            let speaker = '';
+            
+            for (const keywords in conversationData) {
+                const keywordList = keywords.split('|');
+                if (keywordList.some(keyword => text.includes(keyword))) {
+                    const data = conversationData[keywords];
+                    const chosenResponse = data.responses[Math.floor(Math.random() * data.responses.length)];
+                    responseText = typeof chosenResponse === 'function' ? chosenResponse() : chosenResponse;
+                    speaker = data.speaker === '隨機' ? (Math.random() < 0.5 ? '彩奈' : '普拉娜') : data.speaker;
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                const fallbackData = conversationData['fallback'];
+                const chosenResponse = fallbackData.responses[Math.floor(Math.random() * fallbackData.responses.length)];
+                responseText = typeof chosenResponse === 'function' ? chosenResponse() : chosenResponse;
+                speaker = fallbackData.speaker === '隨機' ? (Math.random() < 0.5 ? '彩奈' : '普拉娜') : fallbackData.speaker;
+            }
+
+            addMessageToChat(responseText, speaker);
+            await speak(responseText, speaker);
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (recognition) {
+                recognition.start();
+            } else {
+                alert('您的瀏覽器不支援 Web Speech API。請使用最新版的 Chrome 瀏覽器。');
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (recognition) {
+                recognition.stop();
+            }
+        });
     </script>
 </body>
 </html>
