@@ -11,12 +11,8 @@
   #infoBox { position:fixed; top:20px; right:20px; z-index:100; font-size:16px; color:#334155; text-align:right; }
   #infoBox p { margin:0; padding:2px 0; }
 
-  /* 瀏覽器控制與框架的容器 */
-  #browserContainer { position:fixed; top:0; left:0; width:100%; height:calc(100% - 250px); z-index:0; display:flex; flex-direction:column; }
-  #browserInput { display:flex; padding:8px; background-color:#fff; border-bottom:1px solid #e2e8f0; }
-  #browserInput input { flex:1; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; }
-  #browserInput button { margin-left:8px; padding:6px 12px; border-radius:6px; border:none; background:#0ea5a4; color:white; cursor:pointer; }
-  #browserFrame { flex:1; border:none; }
+  /* 瀏覽器框架 */
+  #browserFrame { position:fixed; top:0; left:0; width:100%; height:calc(100% - 250px); border:none; z-index:0; }
 
   /* 角色與對話框容器 */
   #chaynaContainer, #planaContainer { position:absolute; bottom:10px; width:45%; max-width:450px; z-index:10; }
@@ -40,24 +36,58 @@
   .moodWrap{ display:flex; align-items:center; gap:6px; margin-left:auto; }
   .moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }
 
+  /* 新增的網址輸入框樣式 */
+  #urlInputContainer {
+    position: absolute;
+    bottom: 240px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 6px 20px rgba(2,6,23,.08);
+    display: flex;
+    align-items: center;
+  }
+  #urlInputContainer input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  #urlInputContainer button {
+    margin-left: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #0ea5a4;
+    color: white;
+    cursor: pointer;
+  }
+
   @media (max-width: 900px) {
-    #browserContainer { height:calc(100% - 300px); }
+    #browserFrame { height:calc(100% - 300px); }
     #chaynaContainer, #planaContainer { position:relative; width:90%; left:50%; transform: translateX(-50%); margin-bottom:20px; }
     .character { bottom:auto; position:relative; left:auto; right:auto; margin:20px auto; display:block; }
     .character.plana { display:none; }
+    #urlInputContainer {
+      position: relative;
+      bottom: auto;
+      left: auto;
+      transform: none;
+      width: 90%;
+      margin: 20px auto;
+    }
   }
 </style>
 </head>
 <body>
 <div id="background"></div>
 
-<div id="browserContainer">
-  <div id="browserInput">
-    <input id="urlInput" type="text" placeholder="輸入網址（例如：https://zh.wikipedia.org）" value="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" />
-    <button id="goBtn">前往</button>
-  </div>
-  <iframe id="browserFrame" src="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" sandbox="allow-scripts allow-forms allow-popups allow-same-origin"></iframe>
-</div>
+<iframe id="browserFrame" src="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" sandbox="allow-scripts allow-forms allow-popups allow-same-origin"></iframe>
 
 <img id="chaynaCharacter" class="character chayna" src="chayna.png" alt="彩奈" />
 <img id="planaCharacter" class="character plana" src="plana.png" alt="普拉娜" />
@@ -65,6 +95,11 @@
 <div id="infoBox">
   <p id="currentTime">時間：--:--</p>
   <p id="currentWeather">天氣：--</p>
+</div>
+
+<div id="urlInputContainer">
+  <input id="urlInput" type="text" placeholder="輸入網址（例如：https://zh.wikipedia.org）" value="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" />
+  <button id="goBtn">前往</button>
 </div>
 
 <div id="chaynaContainer">
