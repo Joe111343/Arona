@@ -11,14 +11,17 @@
   #infoBox { position:fixed; top:20px; right:20px; z-index:100; font-size:16px; color:#334155; text-align:right; }
   #infoBox p { margin:0; padding:2px 0; }
 
+  /* 嵌入的瀏覽器框架 */
+  #browserFrame { position:fixed; top:0; left:0; width:100%; height:calc(100% - 250px); border:none; z-index:0; }
+
   /* 角色與對話框容器 */
   #chaynaContainer, #planaContainer { position:absolute; bottom:10px; width:45%; max-width:450px; z-index:10; }
   #chaynaContainer { left:2%; }
   #planaContainer { right:2%; }
 
-  .character { position:absolute; bottom:220px; width:150px; transition: all 0.3s ease; z-index:50; }
-  .character.chayna { left:20%; }
-  .character.plana { right:20%; }
+  .character { position:absolute; bottom:220px; transition: all 0.3s ease; z-index:50; }
+  .character.chayna { left:20%; width:200px; }
+  .character.plana { right:20%; width:150px; }
   
   .chatBox { border:1px solid #cbd5e1; border-radius:12px; background:#fff; height:180px; overflow:auto; padding:12px; box-shadow: 0 6px 20px rgba(2,6,23,.08); }
   .user{ color:#0ea5a4; margin:6px 0; }
@@ -34,14 +37,17 @@
   .moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }
 
   @media (max-width: 900px) {
+    #browserFrame { height:calc(100% - 300px); }
     #chaynaContainer, #planaContainer { position:relative; width:90%; left:50%; transform: translateX(-50%); margin-bottom:20px; }
     .character { bottom:auto; position:relative; left:auto; right:auto; margin:20px auto; display:block; }
-    .character.plana { display:none; } /* 小螢幕下預設隱藏普拉娜 */
+    .character.plana { display:none; }
   }
 </style>
 </head>
 <body>
 <div id="background"></div>
+<iframe id="browserFrame" src="https://www.google.com" sandbox="allow-scripts allow-forms allow-popups allow-same-origin"></iframe>
+
 <img id="chaynaCharacter" class="character chayna" src="chayna.png" alt="彩奈" />
 <img id="planaCharacter" class="character plana" src="plana.png" alt="普拉娜" />
 
@@ -53,6 +59,21 @@
 <div id="chaynaContainer">
   <div id="chaynaChat" class="chatBox" aria-live="polite"></div>
   <div class="controls">
+    <div id="ttsControls">
+      <label>語音:</label>
+      <select id="voiceSelect"></select>
+      <label>速率</label>
+      <input id="rateMin" type="number" step="0.1" value="0.9" style="width:70px" />
+      <input id="rateMax" type="number" step="0.1" value="1.2" style="width:70px" />
+      <label>音調</label>
+      <input id="pitchMin" type="number" step="0.1" value="0.9" style="width:70px" />
+      <input id="pitchMax" type="number" step="0.1" value="1.2" style="width:70px" />
+      <label>TTS</label>
+      <select id="ttsToggle">
+        <option value="on" selected>開</option>
+        <option value="off">關</option>
+      </select>
+    </div>
     <input id="chaynaInput" type="text" placeholder="老師，有什麼需要彩奈幫忙的嗎？(按 Enter)" />
     <button id="chaynaSendBtn">發送</button>
     <button id="chaynaSampleBtn" class="secondary">說句話</button>
@@ -358,7 +379,6 @@ function appendMessage(who, text, chatEl) {
 // ====================== TTS ======================
 let currentUtterance = null;
 function speakText(text) {
-  // 這裡我們只使用一個全域的語音開關
   const ttsToggle = document.getElementById('ttsToggle');
   if (ttsToggle && ttsToggle.value === 'off') return;
   
@@ -366,7 +386,6 @@ function speakText(text) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'zh-TW';
   
-  // 這裡我們只使用一個語音設定
   const voices = speechSynthesis.getVoices();
   const voiceSelect = document.getElementById('voiceSelect');
   if (voiceSelect && voices[parseInt(voiceSelect.value)]) {
@@ -584,3 +603,79 @@ document.getElementById('planaCharacter').addEventListener('click', () => pokeCh
 
 // 語音識別 (這裡我們假設只有一個語音輸入源)
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'zh-TW';
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.onend = () => { recognition.start(); }
+  recognition.onerror = e => { console.error("語音識別錯誤", e); }
+  recognition.onresult = (event) => {
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        const txt = event.results[i][0].transcript.trim();
+        if (txt) {
+          // 將語音輸入同時發送給兩個角色
+          appendMessage('user', txt, document.getElementById('chaynaChat'));
+          appendMessage('user', txt, document.getElementById('planaChat'));
+          // 讓彩奈先回應
+          handleUserMessage(txt, '彩奈');
+        }
+      }
+    }
+  }
+  recognition.start();
+}
+
+// TTS選單與語音設定 (這裡我們只使用一個共用的設定)
+const voiceAndTTSControls = `
+  <label>語音:</label>
+  <select id="voiceSelect"></select>
+  <label>速率</label>
+  <input id="rateMin" type="number" step="0.1" value="0.9" style="width:70px" />
+  <input id="rateMax" type="number" step="0.1" value="1.2" style="width:70px" />
+  <label>音調</label>
+  <input id="pitchMin" type="number" step="0.1" value="0.9" style="width:70px" />
+  <input id="pitchMax" type="number" step="0.1" value="1.2" style="width:70px" />
+  <label>TTS</label>
+  <select id="ttsToggle">
+    <option value="on" selected>開</option>
+    <option value="off">關</option>
+  </select>
+`;
+
+// 在第一個控制面板前加上共用設定
+const chaynaControls = document.querySelector('#chaynaContainer .controls');
+if (chaynaControls) {
+  // 移除舊的共用設定，避免重複添加
+  const existingControls = document.getElementById('ttsControls');
+  if (existingControls) existingControls.remove();
+  
+  const newControlsDiv = document.createElement('div');
+  newControlsDiv.id = 'ttsControls';
+  newControlsDiv.innerHTML = voiceAndTTSControls;
+  chaynaControls.insertAdjacentElement('beforebegin', newControlsDiv);
+}
+
+
+function populateVoices() {
+  const select = document.getElementById('voiceSelect');
+  if (select) {
+    select.innerHTML = '';
+    speechSynthesis.getVoices().forEach((v, i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = v.name + ' (' + v.lang + ')';
+      select.appendChild(o);
+    });
+  }
+}
+speechSynthesis.onvoiceschanged = populateVoices;
+populateVoices();
+
+// 啟動空閒計時
+resetIdleTimer('彩奈');
+resetIdleTimer('普拉娜');
+</script>
+</body>
+</html>
