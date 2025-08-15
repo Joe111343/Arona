@@ -309,10 +309,10 @@
     </style>
 </head>
 <body>
-    <div id="welcomeScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0c4a6e; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200;">
-        <h1 style="color: white; font-size: 2.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">什亭之箱 啟動中...</h1>
-        <p style="color: white; font-size: 1.2rem; margin-top: 10px;">請點擊下方按鈕啟動</p>
-        <button id="startButton" style="padding: 15px 30px; font-size: 1.5rem; background: #0ea5a4; color: white; border: none; border-radius: 12px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 15px rgba(14,165,164,0.4);">
+    <div id="welcomeScreen">
+        <h1>什亭之箱 啟動中...</h1>
+        <p>請點擊下方按鈕啟動</p>
+        <button id="startButton">
             啟動系統
         </button>
     </div>
@@ -422,7 +422,7 @@
                 <input type="text" id="urlInput" placeholder="輸入網址或關鍵字..."/>
                 <button id="goBtn">前往</button>
             </div>
-            <iframe id="browserFrame" src="https://www.google.com/search?q=藍色檔案" frameborder="0"></iframe>
+            <iframe id="browserFrame" src="https://duckduckgo.com/?q=藍色檔案" frameborder="0"></iframe>
         </div>
 
     </div>
@@ -478,9 +478,6 @@
             "老師，請停止此行為，這不在我的預期範圍內。"
           ]
         };
-
-        // 普拉娜的情境權重
-        const moodWeightsPlana = { 分析: 5, 關心: 3, 觀察: 3, 提問: 2 };
 
         // 彩奈的閒聊台詞庫
         const idlePhrasesChayna = {
