@@ -11,8 +11,12 @@
   #infoBox { position:fixed; top:20px; right:20px; z-index:100; font-size:16px; color:#334155; text-align:right; }
   #infoBox p { margin:0; padding:2px 0; }
 
-  /* 嵌入的瀏覽器框架 */
-  #browserFrame { position:fixed; top:0; left:0; width:100%; height:calc(100% - 250px); border:none; z-index:0; }
+  /* 瀏覽器控制與框架的容器 */
+  #browserContainer { position:fixed; top:0; left:0; width:100%; height:calc(100% - 250px); z-index:0; display:flex; flex-direction:column; }
+  #browserInput { display:flex; padding:8px; background-color:#fff; border-bottom:1px solid #e2e8f0; }
+  #browserInput input { flex:1; padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; }
+  #browserInput button { margin-left:8px; padding:6px 12px; border-radius:6px; border:none; background:#0ea5a4; color:white; cursor:pointer; }
+  #browserFrame { flex:1; border:none; }
 
   /* 角色與對話框容器 */
   #chaynaContainer, #planaContainer { position:absolute; bottom:10px; width:45%; max-width:450px; z-index:10; }
@@ -37,7 +41,7 @@
   .moodBadge{ display:none; font-size:12px; padding:4px 8px; border-radius:999px; background:#e0f2fe; color:#075985; }
 
   @media (max-width: 900px) {
-    #browserFrame { height:calc(100% - 300px); }
+    #browserContainer { height:calc(100% - 300px); }
     #chaynaContainer, #planaContainer { position:relative; width:90%; left:50%; transform: translateX(-50%); margin-bottom:20px; }
     .character { bottom:auto; position:relative; left:auto; right:auto; margin:20px auto; display:block; }
     .character.plana { display:none; }
@@ -46,7 +50,14 @@
 </head>
 <body>
 <div id="background"></div>
-<iframe id="browserFrame" src="https://www.google.com" sandbox="allow-scripts allow-forms allow-popups allow-same-origin"></iframe>
+
+<div id="browserContainer">
+  <div id="browserInput">
+    <input id="urlInput" type="text" placeholder="輸入網址（例如：https://zh.wikipedia.org）" value="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" />
+    <button id="goBtn">前往</button>
+  </div>
+  <iframe id="browserFrame" src="https://player.bilibili.com/player.html?bvid=BV1MV41167e9" sandbox="allow-scripts allow-forms allow-popups allow-same-origin"></iframe>
+</div>
 
 <img id="chaynaCharacter" class="character chayna" src="chayna.png" alt="彩奈" />
 <img id="planaCharacter" class="character plana" src="plana.png" alt="普拉娜" />
@@ -557,6 +568,29 @@ function getQAResponse(text, data) {
   }
   return null;
 }
+
+// ====================== 瀏覽器輸入功能 ======================
+const urlInput = document.getElementById('urlInput');
+const goBtn = document.getElementById('goBtn');
+const browserFrame = document.getElementById('browserFrame');
+
+function loadUrl() {
+  let url = urlInput.value.trim();
+  if (url) {
+    // 檢查網址是否包含協定（http/https），如果沒有就加上 https
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    browserFrame.src = url;
+  }
+}
+
+goBtn.addEventListener('click', loadUrl);
+urlInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    loadUrl();
+  }
+});
 
 
 // 事件綁定
